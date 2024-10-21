@@ -1,0 +1,31 @@
+d3 $ sound "hh hh hh hh"
+
+d1 $ sound "[hh hh] [hh hh ~ hh]"
+
+d2 $ sound "hh hh . hh hh hh hh"
+
+d1 $ sound "hh"
+
+d1 $ sound "808bd 808bd 808bd 808bd 808bd 808bd 808bd 808bd"
+
+d2 $ sound "808bd 808bd ~ 808bd 808bd ~ 808bd 808bd"
+
+d3 $ sound "crow:1"
+
+d5 $ sound "cp cp . cp cp cp cp cp cp" # amp 0.05
+
+d5 silence
+
+d5 $ sound "cp cp . [cp cp cp cp cp] cp"
+
+d5 $ s "feel"
+
+d4 silence
+
+d1 silence
+
+d2 silence
+
+d3 silence
+
+hush

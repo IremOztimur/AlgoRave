@@ -1,0 +1,54 @@
+:setcps (88/60)
+
+
+-- Define the bassline pattern
+let bass = stack [
+      s "e1(3,8)",
+      s "g1(3,8)",
+      s "d1(3,8)",
+      s "a1(3,8)"
+    ]
+
+-- Define the synth pattern
+let synth = stack [
+      n "c5(5,8)",
+      n "g5(5,8)",
+      n "d5(5,8)",
+      n "a5(5,8)"
+    ]
+
+
+-- Define the drum pattern
+let drum = stack [
+      sound "bd*2 sn*2",
+      sound "sn*4"
+    ]
+
+-- Play the patterns
+d1 $ stack [
+  every 2 (# speed 2) $ drum
+]
+
+
+-- Define the drum pattern
+let drum = density 2 $ stack [
+      sound "bd*2",
+      sound "sn*4"
+    ]
+
+-- Play the patterns
+d1 $ drum
+
+
+-- Define the synth pattern
+let synth = stack [
+      n "c5(5,8)",
+      n "g5(5,8)",
+      n "d5(5,8)",
+      n "a5(5,8)"
+    ]
+
+-- Play the synth pattern
+d2 $ n "c5" # legato 5
+
+hush

@@ -1,0 +1,13 @@
+-- EFFECTS IN TIDAL !!
+
+d1 $ s "sn*4" # amp "2"
+
+d1 $ s "sn*4" # amp "0.005"
+
+d1 $ s "sn*4" # amp "0.2 1 0.6 0.9"
+
+d2 $ s "808bd*4 . 808bd*2" # amp "2.5"
+
+d2 $ s "tink*4 . tink*2" # amp "2.5"
+
+hush
