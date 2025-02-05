@@ -1,0 +1,34 @@
+await loadScript("https://cdn.jsdelivr.net/gh/ojack/hydra-osc/lib/osc.min.js")
+
+  _osc = new OSC()
+  _osc.open()
+
+  //_osc.on("*", (m) => { console.log(m.address, m.args)})
+  s1 = 5;s2 = 3;s3 = 1 //inital values
+  _osc.on("/color", (m) => {
+    s1 = m.args[0]
+    s2 = m.args[1]
+    s3 = m.args[2]
+  })
+
+  mk=1 //intial value (blanks screen). can set to 1 instead to leave sketch on
+  _osc.on("/mask", (m) => {
+    console.log(m)
+    mk = m.args[0]
+})
+
+speed = 0.3
+
+shape(20,0.2,0.3)
+.color(()=>s1,()=>s2,()=>s3)
+  .scale(() => Math.sin(time)+1*2)
+  .repeat(() => Math.sin(time)*10)
+  .modulateRotate(o0)
+  .scale(() => Math.sin(time)+1 *1.5)
+  .modulate(noise(2,2))
+  .rotate(1, .2)
+  .mask(solid(()=>mk,()=>mk,()=>mk))
+  // .invert(2.4)
+.out(o0)
+
+render(o0)
