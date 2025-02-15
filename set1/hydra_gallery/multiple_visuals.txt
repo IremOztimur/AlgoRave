@@ -5,18 +5,32 @@ _osc.open()
 
 s1 = 5; s2 = 3; s3 = 1 // Initial color values
 mk = 0 // Initial mask value
-
 _osc.on("/color", (m) => {
   s1 = m.args[0]
   s2 = m.args[1]
   s3 = m.args[2]
 })
 
+
 _osc.on("/mask", (m) => {
-  console.log(m)
   mk = m.args[0]
   updateVisual() // Change the visual immediately when the mask value changes
 })
+
+let kickAmp = 0;
+_osc.on("/kick_amp", (m) => {
+  console.log(m)
+  kickAmp = m.args[0];  // Store received amplitude value
+  updateVisual(); // Trigger visual update based on kick intensity
+});
+
+
+let hatIntensity = 0;
+_osc.on("/hat_intensity", (m) => {
+  hatIntensity = m.args[0];  
+  updateVisual();
+});
+
 
 function visual1() {
   return osc(100,-0.0018,0.17).diff(osc(20,0.00008).rotate(Math.PI/0.00003))
@@ -30,13 +44,15 @@ function visual1() {
  .color(22, -2, 0.5, 0.5, 0.0001,  0.1, 0.2, 8).contrast(0.18, 0.3, 0.1, 0.2, 0.03, 1) . brightness(0.0001, -1, 10)
 }
 
+
+
 function visual2() {
   return shape([4,5,6].fast(0.1).smooth(1),0.000001,[0.2,0.7].smooth(1))
-.color(0.2,0.4,0.3)
-.scrollX(()=>Math.sin(time*0.27))
+.color(() => 0.2 + (kickAmp * 0.5), 0.4, () => 0.3 + (kickAmp * 0.5))
+.scrollX(() => Math.sin(time * 0.27) * (1 + kickAmp * 0.3))
 .add(
   shape([4,5,6].fast(0.1).smooth(1),0.000001,[0.2,0.7,0.5,0.3].smooth(1))
-  .color(0.6,0.2,0.5)
+  .color(() => 0.2 + (kickAmp * 0.5), 0.4, () => 0.3 + (kickAmp * 0.5))
   .scrollY(0.35)
   .scrollX(()=>Math.sin(time*0.33)))
 .add(
@@ -49,9 +65,9 @@ function visual2() {
       .scrollX([0.05,-0.05].fast(0.1).smooth(1))
       .scale([1.05,0.9].fast(0.3).smooth(1),[1.05,0.9,1].fast(0.29).smooth(1))
       ,0.85)
-.modulate(voronoi(10,2,2))
+.modulate(voronoi(10, 2, () => 2 + (hatIntensity * 3)));
 }
-
+  
 // Function to switch visuals cleanly
 function updateVisual() {
   solid(0, 0, 0, 1).out(o0) // Clear previous visuals
