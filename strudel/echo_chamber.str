@@ -1,0 +1,126 @@
+// Echo Chamber in Code by @Aviara
+
+await initHydra()
+
+
+samples('github:tidalcycles/dirt-samples')
+ 
+// Set the tempo
+setcps(133/60/4)
+
+
+let hard_vibo = note("<g1 bb1 d2 f1>").layer(
+x=>x.s("sawtooth").vib("<4 6 8 6>".slow(4)),
+x=>x.s("square").add(note(12))
+  .crush(sine.slow(12).range(9, 12))
+).lpf(sine.range(1500, 4000).slow(12))
+  .scope()
+
+
+let soft_vibo = note("<g1 bb1 d2 f1>")
+.add(note("0, -.2")) // <------ chorus
+.s("supersaw")
+  .lpf(sine.range(2000, 4000).slow(12))
+  // .distort(.4)
+  .crush(sine.slow(12).range(12, 16))
+  .gain(.7)
+  .scope()
+
+
+let pads = 
+  // Second pad layer: Muted, detuned triangle with delay
+  "<g1 bb1 d2 f2>".note() // Again, using notes from your bass scale
+    .slow(4) // Even slower for underlying drone
+    .add(sine.slow(3).range(-0.05, 0.05)) // Subtle detuning for movement
+    .s("triangle")
+    .gain(0.88) // Even lower gain
+    .lpf(sine.range(100, 500).slow(24)) // Very low, slow filter
+    .lpq(0.6) // High resonance
+    .delay(0.9) // Longer, more pronounced delay
+    .delayfeedback(0.7) // Increased feedback for lingering echoes
+    .chop(4) // Chop into segments for a broken, unsettling texture
+
+
+let kicks =  stack(
+  s("bd:9*4").bank("tr909").gain(0.9).rarely(x=>x.speed("1.2")).sometimesBy(.2, x=>x.ply("2")),
+  s("bd:2*4").bank("tr909").shape(0.3).crush(sine.fast(4).range(15, 11).slow(12)).gain(0.7)
+)
+  .distort(.3)
+  // .lpf(4000).hpf(40)
+    .delay(sine.fast(2).range(.1, .4))
+    .lpf(sine.range(1000, 2500).slow(12))
+    .lpq(0.2).hpf(40)
+  .velocity(perlin.fast(2).range(.5, 1))
+  //   .room(.2).lpf(mouseX.mul(1800).add(140))
+  // .lpq(mouseY.mul(20))
+  .hpf(slider(0, 0, 5000))
+
+
+let hats = s("white!8").decay(sine.fast(2).range(.05, .2))
+  .almostNever(ply("2 | 4")).crush(7).room(.1)
+  .velocity(perlin.fast(2).range(.5, 1))
+  .distort(.5)
+
+let bell = s("belltree:2")
+  .room(.4)
+  .delay(sine.fast(2).range(.05, .2))
+  .postgain(perlin.range(.8, .9))
+  .attack(.01)
+  .lpf(2500)
+  .lpq(5)
+  .slow(2)
+  .echo(3, 1/4, .3)
+  .jux(rev())
+  .speed(.85)
+  // .speed(saw.range(.2, .5).slow(12))
+  // .lpq(mouseY.mul(20))
+
+
+let dom = s("dr55:2*2")
+  .room(.4)
+  .delay(sine.fast(2).range(.05, .2))
+  .postgain(perlin.range(.8, .9))
+  .attack(.01)
+  .lpf(2500)
+  .lpq(5)
+  .slow(2)
+  .echo(3, 1/4, .3)
+  .jux(rev())
+  .speed(.2)
+  // .speed(saw.range(.2, .5).slow(12))
+  // .lpq(mouseY.mul(20))
+
+body: arrange(
+          [8, stack(pads, bell, dom)],
+             [8, stack(soft_vibo, bell, dom)],
+             [8, stack(soft_vibo, kicks.euclid(2,8).cutoff(300))],
+             [16, stack(hard_vibo, kicks.euclid(4,8), dom.speed(.5))],
+             [8, stack(hard_vibo, kicks.euclid(5,8), hats)],
+            [8, stack(kicks.euclid(4,8).cutoff(50),hard_vibo, hats)],
+            [8, stack(soft_vibo, kicks.euclid(4,8), hats)],
+              [8, stack(pads, dom, soft_vibo, kicks.euclid(3,8))],
+             [8, stack(pads, soft_vibo.cutoff(120), bell.cutoff(perlin.range(300, 800)))],
+            [8, stack(pads, soft_vibo.cutoff("<60 50 64 70 80>"))]
+)  
+  // .theme("<[greenText blackscreen] [redText blackscreen]>/4")  
+
+
+shape(20,0.1,0.2)
+  .scale(() => Math.sin(time)*3)
+.repeat(() => Math.sin(time)*2)
+.modulateRotate(o0)
+.scale(() => Math.sin(time)*3)
+.rotate(0.1, 0.9)
+  .out(o0)
+
+src(o0)
+.modulate(osc(500,0,100))
+.out(o1)
+
+
+src(o1)
+.modulateKaleid(voronoi(() => Math.sin(time)*1,0.1,0.01),() => Math.sin(time)*500)
+.scale(() => Math.sin(time)*3)
+.out(o2)
+
+render(o0)
